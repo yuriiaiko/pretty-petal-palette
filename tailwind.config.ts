@@ -101,6 +101,11 @@ export default {
 			fontFamily: {
 				'script': ['Dancing Script', 'cursive'],
 				'elegant': ['Playfair Display', 'serif']
+			},
+			boxShadow: {
+				'soft': '0 4px 20px hsl(var(--primary) / 0.1)',
+				'elegant': '0 8px 30px hsl(var(--primary) / 0.15)',
+				'glow': '0 0 30px hsl(var(--primary-glow) / 0.3)'
 			}
 		}
 	},
