@@ -12,6 +12,8 @@ import NotFound from "./pages/NotFound";
 import ProductList from "./pages/ProductList";
 import CartPage from "./pages/CartPage";
 import CategoriesPage from "./pages/CategoriesPage";
+import CheckoutPage from "./pages/CheckoutPage";
+import OrderConfirmationPage from "./pages/OrderConfirmationPage";
 import Layout from "./layout/Layout";
 
 import { CartProvider } from "./context/CartContext";
@@ -39,6 +41,24 @@ const App = () => (
                   element={
                     <ProtectedRoute>
                       <CartPage />
+                    </ProtectedRoute>
+                  }
+                />
+                {/* ✅ Protect checkout route */}
+                <Route
+                  path="/checkout"
+                  element={
+                    <ProtectedRoute>
+                      <CheckoutPage />
+                    </ProtectedRoute>
+                  }
+                />
+                {/* ✅ Protect order confirmation route */}
+                <Route
+                  path="/order-confirmation"
+                  element={
+                    <ProtectedRoute>
+                      <OrderConfirmationPage />
                     </ProtectedRoute>
                   }
                 />

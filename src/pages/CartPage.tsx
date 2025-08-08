@@ -1,12 +1,20 @@
 import { useCart } from "@/context/CartContext";
 import { Button } from "@/components/ui/button";
 import { Trash } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { getImageUrl } from "@/lib/utils";
 
 const CartPage = () => {
   const { cartItems, removeFromCart, updateQuantity } = useCart();
+  const navigate = useNavigate();
   const total = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+
+  const handleProceedToCheckout = () => {
+    if (cartItems.length === 0) {
+      return;
+    }
+    navigate('/checkout');
+  };
 
   return (
     <div className="container mx-auto py-16 px-4">
@@ -61,7 +69,13 @@ const CartPage = () => {
 
           <div className="text-right mt-8">
             <p className="text-xl font-bold">Total: ${total.toFixed(2)}</p>
-            <Button className="btn-cosmetics mt-4 px-8 py-3 text-lg">Proceed to Checkout</Button>
+            <Button 
+              onClick={handleProceedToCheckout}
+              className="btn-cosmetics mt-4 px-8 py-3 text-lg"
+              disabled={cartItems.length === 0}
+            >
+              Proceed to Checkout
+            </Button>
           </div>
         </div>
       )}
