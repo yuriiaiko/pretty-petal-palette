@@ -1,19 +1,19 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ShoppingBag, User, Search, Menu, X, Heart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useCart } from '@/context/CartContext';
+import { useAuth } from '@/context/AuthContext';
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
-
-  // Mock auth state - replace with real auth logic
-  const isAuthenticated = false;
-  const isAdmin = false;
+  const { cartItems } = useCart();
+  const { user, logout, isAuthenticated } = useAuth();
 
   const handleLogout = () => {
-    // Add logout logic here
-    navigate('/');
+    logout();
+    navigate("/login");
   };
 
   return (
@@ -30,22 +30,15 @@ const Navbar = () => {
             </span>
           </Link>
 
-          {/* Desktop Navigation */}
+          {/* Navigation */}
           <div className="hidden md:flex items-center space-x-8">
-            <Link to="/" className="text-foreground hover:text-primary transition-colors">
-              Home
-            </Link>
-            <Link to="/products" className="text-foreground hover:text-primary transition-colors">
-              Products
-            </Link>
-            <Link to="/categories" className="text-foreground hover:text-primary transition-colors">
-              Categories
-            </Link>
+            <Link to="/" className="text-foreground hover:text-primary transition-colors">Home</Link>
+            <Link to="/products" className="text-foreground hover:text-primary transition-colors">Products</Link>
+            <Link to="/categories" className="text-foreground hover:text-primary transition-colors">Categories</Link>
           </div>
 
           {/* Actions */}
           <div className="flex items-center space-x-4">
-            {/* Search */}
             <Button variant="ghost" size="sm" className="hidden sm:flex">
               <Search className="w-4 h-4" />
             </Button>
@@ -55,26 +48,17 @@ const Navbar = () => {
               <Button variant="ghost" size="sm" className="relative">
                 <ShoppingBag className="w-4 h-4" />
                 <span className="absolute -top-2 -right-2 bg-primary text-primary-foreground text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                  0
+                  {cartItems.length}
                 </span>
               </Button>
             </Link>
 
             {/* Auth Actions */}
-            {isAuthenticated ? (
+            {isAuthenticated && user ? (
               <div className="flex items-center space-x-2">
-                {isAdmin && (
-                  <Link to="/admin">
-                    <Button variant="outline" size="sm">
-                      Admin
-                    </Button>
-                  </Link>
-                )}
-                <Link to="/account">
-                  <Button variant="ghost" size="sm">
-                    <User className="w-4 h-4" />
-                  </Button>
-                </Link>
+                <span className="text-sm text-muted-foreground hidden sm:inline">
+                  Hello, {user.name || user.email}
+                </span>
                 <Button variant="outline" size="sm" onClick={handleLogout}>
                   Logout
                 </Button>
@@ -94,7 +78,6 @@ const Navbar = () => {
               </div>
             )}
 
-            {/* Mobile Menu Toggle */}
             <Button
               variant="ghost"
               size="sm"
@@ -105,50 +88,6 @@ const Navbar = () => {
             </Button>
           </div>
         </div>
-
-        {/* Mobile Menu */}
-        {isMenuOpen && (
-          <div className="md:hidden py-4 border-t border-border/50">
-            <div className="flex flex-col space-y-4">
-              <Link 
-                to="/" 
-                className="text-foreground hover:text-primary transition-colors"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Home
-              </Link>
-              <Link 
-                to="/products" 
-                className="text-foreground hover:text-primary transition-colors"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Products
-              </Link>
-              <Link 
-                to="/categories" 
-                className="text-foreground hover:text-primary transition-colors"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Categories
-              </Link>
-              
-              {!isAuthenticated && (
-                <div className="flex flex-col space-y-2 pt-4 border-t border-border/50">
-                  <Link to="/login">
-                    <Button variant="ghost" className="w-full justify-start">
-                      Login
-                    </Button>
-                  </Link>
-                  <Link to="/register">
-                    <Button className="btn-cosmetics w-full">
-                      Sign Up
-                    </Button>
-                  </Link>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
       </div>
     </nav>
   );
