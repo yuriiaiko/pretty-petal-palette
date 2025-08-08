@@ -11,6 +11,7 @@ import RegisterPage from "./pages/RegisterPage";
 import NotFound from "./pages/NotFound";
 import ProductList from "./pages/ProductList";
 import CartPage from "./pages/CartPage";
+import CategoriesPage from "./pages/CategoriesPage";
 import Layout from "./layout/Layout";
 
 import { CartProvider } from "./context/CartContext";
@@ -31,6 +32,7 @@ const App = () => (
               <Route element={<Layout />}>
                 <Route path="/" element={<Index />} />
                 <Route path="/products" element={<ProductList />} />
+                <Route path="/categories" element={<CategoriesPage />} />
                 {/* ✅ Protect cart route */}
                 <Route
                   path="/cart"

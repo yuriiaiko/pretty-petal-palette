@@ -2,6 +2,7 @@ import { useCart } from "@/context/CartContext";
 import { Button } from "@/components/ui/button";
 import { Trash } from "lucide-react";
 import { Link } from "react-router-dom";
+import { getImageUrl } from "@/lib/utils";
 
 const CartPage = () => {
   const { cartItems, removeFromCart, updateQuantity } = useCart();
@@ -24,7 +25,7 @@ const CartPage = () => {
             <div key={item.id} className="flex flex-col md:flex-row items-center justify-between gap-4 p-4 bg-white shadow-md rounded-lg">
               <div className="flex items-center gap-4 w-full md:w-2/3">
                 <img
-                  src={`https://localhost:7089${item.imageUrl}`}
+                  src={getImageUrl(item.imageUrl)}
                   alt={item.name}
                   className="w-24 h-24 object-cover rounded"
                 />

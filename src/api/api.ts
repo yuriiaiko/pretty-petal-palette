@@ -43,7 +43,7 @@ API.interceptors.response.use(
     
     // Handle network errors (server not running)
     if (error.code === 'ECONNREFUSED' || error.message === 'Network Error') {
-      console.error('Backend server is not running. Please start your backend server on http://localhost:7089');
+      console.error('Backend server is not running. Please start your backend server on https://localhost:7089');
       // You can show a user-friendly message here
     }
     

@@ -4,15 +4,14 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Eye, EyeOff, Heart, Lock, Mail, User, Phone } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import API from '@/api/api';
 
 const RegisterPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
+    name: '',
     email: '',
-    phone: '',
     password: '',
     confirmPassword: ''
   });
@@ -31,6 +30,16 @@ const RegisterPage = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Validate form data
+    if (!formData.name || !formData.email || !formData.password || !formData.confirmPassword) {
+      toast({
+        title: "Validation Error",
+        description: "Please fill in all required fields.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     if (formData.password !== formData.confirmPassword) {
       toast({
         title: "Password Mismatch",
@@ -40,25 +49,64 @@ const RegisterPage = () => {
       return;
     }
 
+    if (formData.password.length < 6) {
+      toast({
+        title: "Password Too Short",
+        description: "Password must be at least 6 characters long.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsLoading(true);
 
     try {
-      // TODO: Replace with actual API call
-      // const response = await axios.post('/api/auth/register', formData);
+      console.log('Attempting registration with:', { name: formData.name, email: formData.email, password: '***' });
       
-      // Mock successful registration
-      setTimeout(() => {
-        toast({
-          title: "Welcome to ECommerceStore!",
-          description: "Your account has been created successfully.",
-        });
-        navigate('/login');
-      }, 1000);
+      const response = await API.post('/auth/register', {
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
+        confirmPassword: formData.confirmPassword
+      });
+
+      console.log('Registration response:', response.data);
+
+      toast({
+        title: "Welcome to ECommerceStore!",
+        description: "Your account has been created successfully. Please log in.",
+      });
       
-    } catch (error) {
+      navigate('/login');
+      
+    } catch (error: any) {
+      console.error('Registration error:', error);
+      console.error('Error response:', error.response?.data);
+
+      let errorMessage = "Something went wrong. Please try again.";
+      
+      if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (error.response?.data?.error) {
+        errorMessage = error.response.data.error;
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+
+      // Handle specific error cases
+      if (error.response?.status === 400) {
+        errorMessage = "Invalid registration data. Please check your information.";
+      } else if (error.response?.status === 409) {
+        errorMessage = "An account with this email already exists.";
+      } else if (error.response?.status === 404) {
+        errorMessage = "Registration endpoint not found. Please check the API configuration.";
+      } else if (error.response?.status === 500) {
+        errorMessage = "Server error. Please try again later.";
+      }
+
       toast({
         title: "Registration Failed",
-        description: "Something went wrong. Please try again.",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
@@ -83,43 +131,22 @@ const RegisterPage = () => {
 
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <label htmlFor="firstName" className="text-sm font-medium text-foreground">
-                  First Name
-                </label>
-                <div className="relative">
-                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-                  <input
-                    id="firstName"
-                    name="firstName"
-                    type="text"
-                    value={formData.firstName}
-                    onChange={handleInputChange}
-                    className="input-cosmetics pl-10"
-                    placeholder="First name"
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <label htmlFor="lastName" className="text-sm font-medium text-foreground">
-                  Last Name
-                </label>
-                <div className="relative">
-                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-                  <input
-                    id="lastName"
-                    name="lastName"
-                    type="text"
-                    value={formData.lastName}
-                    onChange={handleInputChange}
-                    className="input-cosmetics pl-10"
-                    placeholder="Last name"
-                    required
-                  />
-                </div>
+            <div className="space-y-2">
+              <label htmlFor="name" className="text-sm font-medium text-foreground">
+                Full Name
+              </label>
+              <div className="relative">
+                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                <input
+                  id="name"
+                  name="name"
+                  type="text"
+                  value={formData.name}
+                  onChange={handleInputChange}
+                  className="input-cosmetics pl-10"
+                  placeholder="Enter your full name"
+                  required
+                />
               </div>
             </div>
 
@@ -138,24 +165,6 @@ const RegisterPage = () => {
                   className="input-cosmetics pl-10"
                   placeholder="your@email.com"
                   required
-                />
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <label htmlFor="phone" className="text-sm font-medium text-foreground">
-                Phone Number
-              </label>
-              <div className="relative">
-                <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-                <input
-                  id="phone"
-                  name="phone"
-                  type="tel"
-                  value={formData.phone}
-                  onChange={handleInputChange}
-                  className="input-cosmetics pl-10"
-                  placeholder="+1 (555) 123-4567"
                 />
               </div>
             </div>
@@ -212,25 +221,7 @@ const RegisterPage = () => {
               </div>
             </div>
 
-            <div className="flex items-start space-x-2 text-sm">
-              <input type="checkbox" className="rounded border-border mt-1" required />
-              <span className="text-muted-foreground">
-                I agree to the{' '}
-                <Link to="/terms" className="text-primary hover:text-primary-glow transition-colors">
-                  Terms of Service
-                </Link>{' '}
-                and{' '}
-                <Link to="/privacy" className="text-primary hover:text-primary-glow transition-colors">
-                  Privacy Policy
-                </Link>
-              </span>
-            </div>
-
-            <Button 
-              type="submit" 
-              className="w-full btn-cosmetics"
-              disabled={isLoading}
-            >
+            <Button type="submit" className="w-full btn-cosmetics" disabled={isLoading}>
               {isLoading ? "Creating Account..." : "Create Account"}
             </Button>
           </form>
